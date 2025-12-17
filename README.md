@@ -24,7 +24,7 @@ A modern, extensible React PDF viewer and annotator built on top of PDF.js, desi
 - 🧠 Designed for extensibility
   - Clean context & extension architecture
 
-## OnLine Demo
+## Online Demo
 
 [![Demo](https://img.shields.io/badge/🔥_Live_Demo-React_PDF_Viewer_Plus-FF6F61?style=for-the-badge&logo=github&logoColor=white)](https://laomai-codefee.github.io/react-pdf-viewer-plus-demo/)
 
