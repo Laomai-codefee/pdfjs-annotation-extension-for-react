@@ -5,10 +5,11 @@ import { PdfViewerProvider } from '../../context/pdf_viewer_provider'
 import i18n from '@/i18n'
 import { PdfBaseProps } from '@/types'
 import { ZoomTool } from '@/components/zoom_tool'
-import { Theme } from '@radix-ui/themes'
+import { Flex, Separator, Theme } from '@radix-ui/themes'
 import { usePdfViewerContext } from '@/context/pdf_viewer_context'
 import { ViewerExtension } from '@/extensions/viewer'
 import { EventBus, PDFViewer } from 'pdfjs-dist/types/web/pdf_viewer'
+import { PageTool } from '@/components/page_tool'
 
 export interface PdfViewerContextValue {
     pdfViewer: PDFViewer | null
@@ -17,7 +18,6 @@ export interface PdfViewerContextValue {
 }
 
 export interface PdfViewerProps extends PdfBaseProps {
-
     /**
      * 自定义额外按钮区域组件
      * 可以是一个 React 组件或者 React 元素
@@ -28,14 +28,14 @@ export interface PdfViewerProps extends PdfBaseProps {
      * 自定义侧边栏组件
      * 可以是一个 React 组件或者 React 元素
      */
-    sidebar?:  React.ReactNode | ((context: PdfViewerContextValue) => React.ReactNode)
+    sidebar?: React.ReactNode | ((context: PdfViewerContextValue) => React.ReactNode)
 
     /**
      * 自定义工具栏组件
      * 可以是一个 React 组件或者 React 元素
      * 默认显示 ZoomTool 组件
      */
-    toolbar?:  React.ReactNode | ((context: PdfViewerContextValue) => React.ReactNode)
+    toolbar?: React.ReactNode | ((context: PdfViewerContextValue) => React.ReactNode)
 
     /**
      * 是否显示侧边栏触发按钮
@@ -51,15 +51,15 @@ export interface PdfViewerProps extends PdfBaseProps {
 
     /**
      * 文档加载完成回调
-     * @param pdfViewer 
-     * @returns 
+     * @param pdfViewer
+     * @returns
      */
     onDocumentLoaded?: (pdfViewer: PDFViewer | null) => void
 
     /**
      * PDFjs EventBus 完成回调
-     * @param eventBus 
-     * @returns 
+     * @param eventBus
+     * @returns
      */
     onEventBusReady?: (eventBus: EventBus | null) => void
 }
@@ -96,15 +96,23 @@ const ToolBarRenderer: React.FC<{ toolbar?: PdfViewerProps['toolbar'] }> = ({ to
     const context = usePdfViewerContext()
 
     if (!toolbar) {
-        return <ZoomTool />
+        return (
+            <Flex gap="3" align="center">
+                <PageTool /> <Separator orientation="vertical" />
+                <ZoomTool />
+            </Flex>
+        )
     }
 
     if (typeof toolbar === 'function') {
         return (
-            <>
+            <Flex gap="3" align="center">
+                <PageTool />
+                <Separator orientation="vertical" />
                 <ZoomTool />
+                <Separator orientation="vertical" />
                 {toolbar(context)}
-            </>
+            </Flex>
         )
     }
 
@@ -128,12 +136,15 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
     onDocumentLoaded,
     onEventBusReady
 }) => {
-    const viewerOptions = useMemo(() => ({
-        textLayerMode: showTextLayer ? 1 : 0,
-        annotationMode: 0,
-        externalLinkTarget: 0,
-        enableRange,
-    }), [showTextLayer])
+    const viewerOptions = useMemo(
+        () => ({
+            textLayerMode: showTextLayer ? 1 : 0,
+            annotationMode: 0,
+            externalLinkTarget: 0,
+            enableRange
+        }),
+        [showTextLayer]
+    )
 
     useEffect(() => {
         i18n.changeLanguage(locale)
