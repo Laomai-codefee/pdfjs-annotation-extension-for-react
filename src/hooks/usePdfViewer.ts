@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs'
 import { DownloadManager, EventBus, PDFFindController, PDFLinkService, PDFViewer } from 'pdfjs-dist/legacy/web/pdf_viewer.mjs'
-import { AnnotationMode, getDocument, PDFDataRangeTransport, PDFDocumentLoadingTask, PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs'
+import { AnnotationEditorType, AnnotationMode, getDocument, PDFDataRangeTransport, PDFDocumentLoadingTask, PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs'
 
 import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
 
@@ -89,8 +89,10 @@ export function usePdfViewer(containerRef: React.RefObject<HTMLDivElement>, opti
             eventBus: bus,
             textLayerMode,
             annotationMode,
+            annotationEditorMode: AnnotationEditorType.DISABLE,
             linkService,
             downloadManager,
+            removePageBorders: true,
             findController: fc,
         })
 

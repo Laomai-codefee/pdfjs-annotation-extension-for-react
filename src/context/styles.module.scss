@@ -111,6 +111,13 @@
         }
     }
 
+    :global(.textLayer) {
+        z-index: 9 !important;
+    }
+    :global(.annotationLayer) { 
+        z-index: 10 !important;
+    }
+
     :global(.highlight) {
         background-color: rgb(255, 255, 0) !important;
         opacity: 0.5;

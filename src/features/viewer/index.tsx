@@ -41,6 +41,12 @@ export interface PdfViewerProps extends PdfBaseProps {
     showTextLayer?: boolean
 
     /**
+     * 是否显示原生批注
+     * @default false
+     */
+    showAnnotations?: boolean
+
+    /**
      * 默认选中的侧边栏项 key
      */
     defaultActiveSidebarKey?: SidebarPanelKey | null
@@ -114,16 +120,16 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
     sidebar,
     toolbar,
     showTextLayer = true,
+    showAnnotations = false,
     defaultActiveSidebarKey,
     onDocumentLoaded,
     onEventBusReady
 }) => {
     const { t } = useTranslation(['viewer'], { useSuspense: false })
-    
     const viewerOptions = useMemo(
         () => ({
             textLayerMode: showTextLayer ? 1 : 0,
-            annotationMode: 0,
+            annotationMode: showAnnotations ? 1 : 0,
             externalLinkTarget: 0,
             enableRange
         }),

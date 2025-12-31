@@ -276,6 +276,7 @@ import qiantubifengshouxietiFont from './fonts/qiantubifengshouxieti.ttf';
 | `sidebar`            | `SidebarPanel[]` | —        | Custom sidebar component                                                                   |
 | `toolbar`            | `React.ReactNode \| (context: PdfViewerContextValue) => React.ReactNode` | —        | Custom toolbar component                                                                   |
 | `showTextLayer`      | `boolean`                                                               | `true`  | Whether to render the text layer                                                           |
+| `showAnnotations`      | `boolean`                                                               | `false`  | Whether to render the pdf annotations layer                                              |
 | `defaultActiveSidebarKey`      | `string`                                                     | null  | Default Active Sidebar Key                                                       |
 | `onDocumentLoaded`   | `(pdfViewer: PDFViewer \| null) => void`                                 | —        | Callback invoked when the PDF <br />document is fully loaded and the viewer is initialized |
 | `onEventBusReady`    | `(eventBus: EventBus \| null) => void`                                   | —        | Callback invoked when the pdf.js EventBus is ready                                         |

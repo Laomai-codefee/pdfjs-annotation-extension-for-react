@@ -13,6 +13,8 @@ const PdfViewerCustom: React.FC = () => {
                 url={pdfUrl}
                 layoutStyle={{ width: '100vw', height: '96vh' }}
                 locale='en-US'
+                showTextLayer={false}
+                showAnnotations={true}
                 defaultActiveSidebarKey="sidebar-1"
                 actions={(context) => (
                     <>
