@@ -3,9 +3,59 @@ import { PDFName, PDFString, PDFNumber } from 'pdf-lib'
 import { convertKonvaRectToPdfRect, rgbToPdfColor, stringToPDFHexString } from '../../utils/utils'
 import { t } from 'i18next'
 
+function quadBezier(
+    p0: number[],
+    p1: number[],
+    p2: number[],
+    segments = 12
+) {
+    const pts: number[] = []
+    for (let i = 1; i <= segments; i++) {
+        const t = i / segments
+        const x =
+            (1 - t) * (1 - t) * p0[0] +
+            2 * (1 - t) * t * p1[0] +
+            t * t * p2[0]
+        const y =
+            (1 - t) * (1 - t) * p0[1] +
+            2 * (1 - t) * t * p1[1] +
+            t * t * p2[1]
+        pts.push(x, y)
+    }
+    return pts
+}
+
+function cubicBezier(
+    p0: number[],
+    p1: number[],
+    p2: number[],
+    p3: number[],
+    segments = 16
+) {
+    const pts: number[] = []
+    for (let i = 1; i <= segments; i++) {
+        const t = i / segments
+        const x =
+            Math.pow(1 - t, 3) * p0[0] +
+            3 * Math.pow(1 - t, 2) * t * p1[0] +
+            3 * (1 - t) * t * t * p2[0] +
+            t * t * t * p3[0]
+        const y =
+            Math.pow(1 - t, 3) * p0[1] +
+            3 * Math.pow(1 - t, 2) * t * p1[1] +
+            3 * (1 - t) * t * t * p2[1] +
+            t * t * t * p3[1]
+        pts.push(x, y)
+    }
+    return pts
+}
+
 function parseSvgPathToPoints(data: string): number[] {
     const commands = data.match(/[a-zA-Z][^a-zA-Z]*/g) || []
     const points: number[] = []
+
+    let current: number[] = [0, 0]
+
     for (const cmd of commands) {
         const type = cmd[0]
         const nums = cmd
@@ -14,27 +64,39 @@ function parseSvgPathToPoints(data: string): number[] {
             .split(/[\s,]+/)
             .map(parseFloat)
 
-        if (type === 'M' || type === 'L') {
-            // MoveTo / LineTo：直接加入坐标
+        if (type === 'M') {
+            current = [nums[0], nums[1]]
+            points.push(...current)
+        }
+
+        if (type === 'L') {
             for (let i = 0; i < nums.length; i += 2) {
-                points.push(nums[i], nums[i + 1])
+                current = [nums[i], nums[i + 1]]
+                points.push(...current)
             }
-        } else if (type === 'Q') {
-            // Quadratic curve：控制点忽略，仅取终点
-            if (nums.length >= 4) {
-                points.push(nums[2], nums[3])
-            }
-        } else if (type === 'C') {
-            // Cubic Bezier：同理，取终点
-            if (nums.length >= 6) {
-                points.push(nums[4], nums[5])
-            }
-        } else if (type === 'Z' || type === 'z') {
-            // Close path，忽略
+        }
+
+        if (type === 'Q') {
+            const p0 = current
+            const p1 = [nums[0], nums[1]]
+            const p2 = [nums[2], nums[3]]
+            points.push(...quadBezier(p0, p1, p2))
+            current = p2
+        }
+
+        if (type === 'C') {
+            const p0 = current
+            const p1 = [nums[0], nums[1]]
+            const p2 = [nums[2], nums[3]]
+            const p3 = [nums[4], nums[5]]
+            points.push(...cubicBezier(p0, p1, p2, p3))
+            current = p3
         }
     }
+
     return points
 }
+
 
 export class PolylineParser extends AnnotationParser {
     async parse() {
