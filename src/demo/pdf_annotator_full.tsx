@@ -18,6 +18,7 @@ const PdfAnnotatorFull: React.FC = () => {
                     id: '9527',
                     name: 'Lao Mai'
                 }}
+                appearance='dark'
                 enableNativeAnnotations={true}
                 locale="en-US"
                 initialAnnotations={[{

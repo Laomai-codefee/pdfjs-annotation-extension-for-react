@@ -1,5 +1,5 @@
 import { computePosition, flip, Middleware, Placement } from '@floating-ui/dom'
-import { Button, Flex } from '@radix-ui/themes'
+import { Button, Flex, useThemeContext } from '@radix-ui/themes'
 import React, {
     forwardRef,
     useImperativeHandle,
@@ -318,6 +318,7 @@ const PopoverBar = forwardRef<PopoverBarRef, PopoverBarProps>(function PopoverBa
                 size="2"
                 variant='ghost'
                 color='gray'
+                highContrast
                 style={{
                     opacity: button.disabled ? 0.5 : 1,
                     boxShadow: 'none',
@@ -334,6 +335,8 @@ const PopoverBar = forwardRef<PopoverBarRef, PopoverBarProps>(function PopoverBa
         ))
     }, [buttons, close, renderButtons])
 
+    const { appearance } = useThemeContext()
+
     const baseStyle: React.CSSProperties = {
         position: 'absolute',
         top: 0,
@@ -341,7 +344,7 @@ const PopoverBar = forwardRef<PopoverBarRef, PopoverBarProps>(function PopoverBa
         zIndex: 999,
         display: isVisible ? 'block' : 'none',
         width: 'max-content',
-        backgroundColor: '#fff',
+        backgroundColor: appearance === 'light' ?  '#fff' : '#242430',
         boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)',
         border: '1px solid rgba(0, 0, 0, 0.1)',
         borderRadius: 4,

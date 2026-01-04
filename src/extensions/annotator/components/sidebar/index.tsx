@@ -521,9 +521,9 @@ const Sidebar: React.FC = () => {
                                                 variant="ghost"
                                                 color="gray"
                                                 size="2"
+                                                highContrast
                                                 style={{
-                                                    boxShadow: 'none',
-                                                    color: '#000000'
+                                                    boxShadow: 'none'
                                                 }}
                                                 m="2"
                                             >
@@ -555,9 +555,9 @@ const Sidebar: React.FC = () => {
                                                 color="gray"
                                                 size="2"
                                                 m="2"
+                                                highContrast
                                                 style={{
-                                                    boxShadow: 'none',
-                                                    color: '#000000'
+                                                    boxShadow: 'none'
                                                 }}
                                             >
                                                 <AiOutlineEllipsis />
@@ -610,10 +610,10 @@ const Sidebar: React.FC = () => {
                                                     <Button
                                                         variant="outline"
                                                         color="gray"
+                                                        highContrast
                                                         size="2"
                                                         style={{
-                                                            boxShadow: 'none',
-                                                            color: '#000000'
+                                                            boxShadow: 'none'
                                                         }}
                                                     >
                                                         <AiOutlineEllipsis />
@@ -666,9 +666,9 @@ const Sidebar: React.FC = () => {
                             variant="outline"
                             size="2"
                             color="gray"
+                            highContrast
                             style={{
                                 boxShadow: 'none',
-                                color: '#000000',
                                 fontSize: '16px'
                             }}
                         >

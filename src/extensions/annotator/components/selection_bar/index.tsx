@@ -45,7 +45,7 @@ const SelectionBar = forwardRef<SelectionBarRef, SelectionBarProps>(function Sel
             renderButtons={() => [
                 {
                     key: 'highlight',
-                    icon: <HighlightIcon style={{ color: '#000000d6'}} />,
+                    icon: <HighlightIcon />,
                     onClick: (range) => {
                         const annotation = annotationDefinitions.find(a => a.name === 'highlight') as IAnnotationType
                         painter?.highlightRange(range, annotation)
@@ -55,7 +55,7 @@ const SelectionBar = forwardRef<SelectionBarRef, SelectionBarProps>(function Sel
                 },
                 {
                     key: 'underline',
-                    icon: <UnderlineIcon style={{ color: '#000000d6'}} />,
+                    icon: <UnderlineIcon />,
                     onClick: (range) => {
                         const annotation = annotationDefinitions.find(a => a.name === 'underline') as IAnnotationType
                         painter?.highlightRange(range, annotation)
@@ -65,7 +65,7 @@ const SelectionBar = forwardRef<SelectionBarRef, SelectionBarProps>(function Sel
                 },
                 {
                     key: 'strikeout',
-                    icon: <StrikeoutIcon style={{ color: '#000000d6'}} />,
+                    icon: <StrikeoutIcon />,
                     onClick: (range) => {
                         const annotation = annotationDefinitions.find(a => a.name === 'strikeout') as IAnnotationType
                         painter?.highlightRange(range, annotation)

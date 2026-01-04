@@ -17,8 +17,10 @@ import { Button, DropdownMenu, Separator, Theme } from '@radix-ui/themes'
 import { AnnoIcon } from '@/extensions/annotator/const/icons'
 import { AiOutlineSave, AiOutlineSearch } from 'react-icons/ai'
 import { SearchSidebar } from '@/components/search_sidebar'
+import useSystemAppearance from '@/hooks/useSystemAppearance'
 
 export const PdfAnnotator: React.FC<PdfAnnotatorProps> = ({
+    appearance = 'auto',
     enableRange = 'auto',
     theme = 'violet',
     title = 'PDF ANNOTATOR',
@@ -49,6 +51,10 @@ export const PdfAnnotator: React.FC<PdfAnnotatorProps> = ({
     }, [defaultOptions])
 
     const [getPrimaryColor, setGetPrimaryColor] = useState<string>(() => getThemeColor())
+
+    const systemAppearance = useSystemAppearance();
+
+    const finalAppearance = appearance === 'auto' ? systemAppearance : appearance
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -139,7 +145,7 @@ export const PdfAnnotator: React.FC<PdfAnnotatorProps> = ({
     }
 
     return (
-        <Theme accentColor={theme}>
+        <Theme accentColor={theme} appearance={finalAppearance}>
             <PainterProvider>
                 <OptionsContext.Provider
                     value={{
@@ -159,7 +165,7 @@ export const PdfAnnotator: React.FC<PdfAnnotatorProps> = ({
                             {
                                 key: 'search-sidebar',
                                 title: t('viewer:search.search'),
-                                icon: <AiOutlineSearch style={{width: 18, height: 18}} />,
+                                icon: <AiOutlineSearch style={{ width: 18, height: 18 }} />,
                                 render: (context) => <SearchSidebar pdfViewer={context.pdfViewer} />
                             },
                             {

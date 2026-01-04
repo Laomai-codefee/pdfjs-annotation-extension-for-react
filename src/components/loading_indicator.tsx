@@ -1,90 +1,81 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Flex, Spinner, Box, Text, Progress } from '@radix-ui/themes';
-import { useTranslation } from 'react-i18next';
+import React, { useEffect, useRef, useState } from 'react'
+import { Flex, Spinner, Box, Text, Progress, useThemeContext } from '@radix-ui/themes'
+import { useTranslation } from 'react-i18next'
 
-/* =========================
- * Loading 遮罩 Hook
- * ========================= */
 function useDelayedLoading(loading: boolean, delay: number) {
-    const [visible, setVisible] = useState(false);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const [visible, setVisible] = useState(false)
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
 
     useEffect(() => {
         if (loading) {
             timerRef.current = setTimeout(() => {
-                setVisible(true);
-            }, delay);
+                setVisible(true)
+            }, delay)
         } else {
             if (timerRef.current) {
-                clearTimeout(timerRef.current);
-                timerRef.current = null;
+                clearTimeout(timerRef.current)
+                timerRef.current = null
             }
-            setVisible(false);
+            setVisible(false)
         }
 
         return () => {
             if (timerRef.current) {
-                clearTimeout(timerRef.current);
-                timerRef.current = null;
+                clearTimeout(timerRef.current)
+                timerRef.current = null
             }
-        };
-    }, [loading, delay]);
+        }
+    }, [loading, delay])
 
-    return visible;
+    return visible
 }
 
-/* =========================
- * Progress 展示 Hook
- * ========================= */
 function useTransientProgress(progress: number, hideDelay: number) {
-    const [visible, setVisible] = useState(false);
-    const [displayValue, setDisplayValue] = useState(progress);
+    const [visible, setVisible] = useState(false)
+    const [displayValue, setDisplayValue] = useState(progress)
 
-    const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
-    const lastProgressRef = useRef(progress);
+    const hideTimerRef = useRef<NodeJS.Timeout | null>(null)
+    const lastProgressRef = useRef(progress)
 
     useEffect(() => {
-        if (progress === lastProgressRef.current) return;
-        lastProgressRef.current = progress;
+        if (progress === lastProgressRef.current) return
+        lastProgressRef.current = progress
 
-        setDisplayValue(progress);
+        setDisplayValue(progress)
 
         if (!visible) {
-            setVisible(true);
+            setVisible(true)
         }
 
         if (hideTimerRef.current) {
-            clearTimeout(hideTimerRef.current);
+            clearTimeout(hideTimerRef.current)
         }
 
         hideTimerRef.current = setTimeout(() => {
-            setVisible(false);
-            hideTimerRef.current = null;
-        }, hideDelay);
-    }, [progress, hideDelay, visible]);
+            setVisible(false)
+            hideTimerRef.current = null
+        }, hideDelay)
+    }, [progress, hideDelay, visible])
 
     return {
         visible,
         value: displayValue
-    };
+    }
 }
 
 export interface LoadingIndicatorProps {
-    loading: boolean;
-    progress: number; // 0 ~ 100
-    loadingDelay?: number;
-    progressHideDelay?: number;
+    loading: boolean
+    progress: number // 0 ~ 100
+    loadingDelay?: number
+    progressHideDelay?: number
 }
 
-export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
-    loading,
-    progress,
-    loadingDelay = 500,
-    progressHideDelay = 1500
-}) => {
-    const showLoading = useDelayedLoading(loading, loadingDelay);
-    const progressBar = useTransientProgress(progress, progressHideDelay);
-    const { t } = useTranslation(['common']);
+export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ loading, progress, loadingDelay = 500, progressHideDelay = 1500 }) => {
+    const showLoading = useDelayedLoading(loading, loadingDelay)
+    const progressBar = useTransientProgress(progress, progressHideDelay)
+    const { t } = useTranslation(['common'])
+
+    const { appearance } = useThemeContext()
     return (
         <>
             {/* Loading 遮罩 */}
@@ -96,7 +87,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
                     justify="center"
                     direction="column"
                     style={{
-                        backgroundColor: 'rgba(255,255,255,0.85)',
+                        backgroundColor: appearance === 'dark' ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.85)',
                         backdropFilter: 'blur(2px)',
                         zIndex: 1000
                     }}
@@ -115,11 +106,11 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
                 <Progress
                     value={progressBar.value}
                     size="1"
-                    variant="soft"
+                    variant={appearance === 'dark' ? 'surface' : 'soft'}
                     style={{
                         position: 'absolute',
-                        opacity: 0.5,
-                        height: '2px',
+                        opacity: appearance === 'dark' ? 1 : 0.5,
+                        height: appearance === 'dark' ? '3px' : '2px',
                         top: 0,
                         left: 0,
                         width: '100%',
@@ -128,5 +119,5 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
                 />
             )}
         </>
-    );
-};
+    )
+}

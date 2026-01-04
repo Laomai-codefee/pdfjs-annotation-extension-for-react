@@ -27,6 +27,11 @@ export type PdfScale = 'auto' | 'page-actual' | 'page-fit' | 'page-width' | stri
 
 export interface PdfBaseProps {
     /**
+     * 主题模式
+     * @default 'auto'
+     */
+    appearance?: "auto" | "dark" | "light"
+    /**
      * 主题色
      * @default: 'violet'
      */

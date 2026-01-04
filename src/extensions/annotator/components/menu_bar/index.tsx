@@ -131,7 +131,7 @@ const MenuBar = forwardRef<MenuBarRef, MenuBarProps>(function MenuBar(props, ref
                             ? [
                                   {
                                       key: 'comment',
-                                      icon: <AnnoIcon style={{ color: '#000000d6' }} />,
+                                      icon: <AnnoIcon />,
                                       onClick: () => {
                                           handleOpenComment(currentAnnotation)
                                           popoverBarRef.current?.close()
@@ -144,7 +144,7 @@ const MenuBar = forwardRef<MenuBarRef, MenuBarProps>(function MenuBar(props, ref
                             ? [
                                   {
                                       key: 'palette',
-                                      icon: <PaletteSingleColorIcon style={{ color: '#000000d6' }} />,
+                                      icon: <PaletteSingleColorIcon />,
                                       onClick: () => {
                                           setShowStyle(!showStyle)
                                       },
@@ -154,7 +154,7 @@ const MenuBar = forwardRef<MenuBarRef, MenuBarProps>(function MenuBar(props, ref
                             : []),
                         {
                             key: 'delete',
-                            icon: <DeleteIcon style={{ color: '#000000d6' }} />,
+                            icon: <DeleteIcon/>,
                             onClick: () => {
                                 handleAnnotationDelete()
                                 popoverBarRef.current?.close()

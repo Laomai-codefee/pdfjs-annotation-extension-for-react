@@ -193,7 +193,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({ defaultAnnotationName, stamps,
                     disabled={isColorDisabled}
                     icon={
                         <PaletteIcon
-                            style={{ color: currentAnnotationType?.style?.color }}
+                            style={{ '--palette-preview-color': currentAnnotationType?.style?.color } as React.CSSProperties}
                         />
                     }
                 />}

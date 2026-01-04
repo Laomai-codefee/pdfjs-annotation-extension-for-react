@@ -52,12 +52,10 @@
         border: 1px solid #ccc;
         border-top: 0;
         margin: 0 auto;
-
         .colorPalette {
             display: flex;
             margin: 8px;
             height: 24px;
-
             .cell {
                 cursor: pointer;
                 width: 22px;
@@ -81,6 +79,26 @@
                 border: 1px solid #bbb;
             }
         }
+        .colorPaletteDark {
+            .cell {
+                border: 1px solid rgba(0, 0, 0, 0);
+            }
+            .active {
+                border: 1px solid #bbb;
+            }
+        }
+    }
+
+    .toolbarDark {
+        border: 1px solid  rgba(148, 163, 184, 0.12);
+        .colorPalette {
+            .cell {
+                border: 1px solid rgba(0, 0, 0, 0);
+            }
+            .active {
+                border: 1px solid  rgba(148, 163, 184, 0.3);
+            }
+        }
     }
 }
 
@@ -95,16 +113,16 @@
         list-style: none;
         padding: 0;
         li:hover {
-            
             background-color: #ededed;
         }
     }
     li {
         display: flex;
-        border-radius: 5px ;
+        border-radius: 5px;
         margin-bottom: 8px;
         justify-content: center;
         align-items: center;
+        background-color: #fff;
         img {
             height: 48px;
             max-width: 100px;

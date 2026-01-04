@@ -10,6 +10,7 @@ const PdfAnnotatorBasic: React.FC = () => {
             title="PDF Annotator"
             layoutStyle={{ height: '96vh' }}
             url={pdfUrl}
+            appearance="light"
             user={{ id: 'u1', name: 'Alice' }}
             locale="en-US"
             onSave={(annotations) => {

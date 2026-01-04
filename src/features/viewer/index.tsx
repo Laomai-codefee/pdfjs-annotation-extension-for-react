@@ -1,6 +1,6 @@
 import '@radix-ui/themes/styles.css'
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { PdfViewerProvider, SidebarPanel, SidebarPanelKey } from '../../context/pdf_viewer_provider'
 import i18n from '@/i18n'
 import { PdfBaseProps } from '@/types'
@@ -13,6 +13,7 @@ import { SearchSidebar } from '@/components/search_sidebar'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { useTranslation } from 'react-i18next'
 import { PrintTool } from '@/components/print_tool'
+import useSystemAppearance from '@/hooks/useSystemAppearance'
 
 
 export interface PdfViewerProps extends PdfBaseProps {
@@ -109,6 +110,7 @@ const ToolBarRenderer: React.FC<{ toolbar?: PdfViewerProps['toolbar'] }> = ({ to
 }
 
 export const PdfViewer: React.FC<PdfViewerProps> = ({
+    appearance = 'auto',
     enableRange = 'auto',
     title = 'PDF VIEWER',
     url,
@@ -140,15 +142,19 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
         i18n.changeLanguage(locale)
     }, [locale])
 
+    const systemAppearance = useSystemAppearance();
+
+    const finalAppearance = appearance === 'auto' ? systemAppearance : appearance
+
     return (
-        <Theme accentColor={theme}>
+        <Theme accentColor={theme} appearance={finalAppearance}>
             <PdfViewerProvider
                 title={title}
                 url={url}
                 sidebar={[{
                     key: 'search-sidebar',
                     title: t('viewer:search.search'),
-                    icon: <AiOutlineSearch style={{width: 18, height: 18}} />,
+                    icon: <AiOutlineSearch style={{ width: 18, height: 18 }} />,
                     render: (context) => <SearchSidebar pdfViewer={context.pdfViewer} />
                 }, ...(sidebar || [])]}
                 defaultActiveSidebarKey={defaultActiveSidebarKey}

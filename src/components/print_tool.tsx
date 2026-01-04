@@ -18,9 +18,9 @@ export const PrintTool: React.FC = () => {
                 variant="outline"
                 size="2"
                 color="gray"
+                highContrast
                 style={{
                     boxShadow: 'none',
-                    color: '#000000'
                 }}
                 onClick={() => printClean()}
             >

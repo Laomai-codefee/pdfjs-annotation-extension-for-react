@@ -1,36 +1,74 @@
 .PdfjsExtensionViewer {
-    --bg-color: #fafafa;
+    --bg-color: #fff;
     --bg-color-secondary: #ededed;
     --bg-color-tertiary: #f9f9f9;
     --bg-color-quaternary: #e4e4e4;
-
-    --border-color: rgba(0, 0, 0, 0.06);
-    --border-color-light: rgba(0, 0, 0, 0.03);
-    --border-color-strong: rgba(0, 0, 0, 0.12);
-
-    --bg-hover: rgba(0, 0, 0, 0.04);
-    --bg-hover-subtle: rgba(0, 0, 0, 0.02);
-
-    --bg-active: rgba(0, 0, 0, 0.03);
-    --bg-active-strong: rgba(0, 0, 0, 0.06);
-
-    --bg-selected: rgba(0, 0, 0, 0.035);
-    --bg-selected-strong: rgba(0, 0, 0, 0.055);
-
+    --bg-hover: rgba(0, 0, 0, 0.02);
+    --bg-hover-subtle: rgba(0, 0, 0, 0.06);
+    --bg-active: rgba(0, 0, 0, 0.08);
+    --bg-active-strong: rgba(0, 0, 0, 0.12);
+    --bg-selected: rgba(0, 0, 0, 0.04);
+    --bg-selected-strong: rgba(0, 0, 0, 0.1);
     --bg-focus: rgba(0, 0, 0, 0.06);
     --focus-ring: rgba(0, 0, 0, 0.1);
-
+    --border-color: rgba(0, 0, 0, 0.06);
     --bg-disabled: rgba(0, 0, 0, 0.02);
     --text-disabled: rgba(0, 0, 0, 0.25);
-
     --header-height: 45px;
     --toolbar-height: 40px;
     --shadow-light: 0 1px 2px rgba(0, 0, 0, 0.03);
     --shadow-medium: 0 2px 6px rgba(0, 0, 0, 0.06);
     --shadow-heavy: 0 6px 16px rgba(0, 0, 0, 0.1);
 
+    --dark-bg-color: #1e1e26;
+    --dark-bg-color-secondary: #242430;
+    --dark-bg-color-tertiary: #2a2a36;
+    --dark-bg-color-quaternary: #2e2e3c;
+
+    --dark-border-color: rgba(148, 163, 184, 0.12);
+    --dark-border-color-light: rgba(255, 255, 255, 0.03);
+    --dark-border-color-strong: rgba(148, 163, 184, 0.2);
+
+    --dark-bg-hover: #363648;
+    --dark-bg-hover-subtle: #2f2f3e;
+    --dark-bg-active: #2a2a36;
+    --dark-bg-active-strong: #262632;
+
+    --dark-bg-selected: #3e3e4a;
+    --dark-bg-selected-strong: #474756;
+
     background-color: var(--bg-color);
     height: 100%;
+
+    :global(.dark) &,
+    &.dark,
+    :global([data-theme='dark']) &,
+    &[data-theme='dark'] {
+        --bg-color: var(--dark-bg-color);
+        --bg-color-secondary: var(--dark-bg-color-secondary);
+        --bg-color-tertiary: var(--dark-bg-color-tertiary);
+        --bg-color-quaternary: var(--dark-bg-color-quaternary);
+
+        --border-color: var(--dark-border-color);
+        --border-color-light: var(--dark-border-color-light);
+        --border-color-strong: var(--dark-border-color-strong);
+
+        --bg-hover: var(--dark-bg-hover);
+        --bg-hover-subtle: var(--dark-bg-hover-subtle);
+
+        --bg-active: var(--dark-bg-active);
+        --bg-active-strong: var(--dark-bg-active-strong);
+
+        --bg-selected: var(--dark-bg-selected);
+        --bg-selected-strong: var(--dark-bg-selected-strong);
+
+        --bg-focus: var(--dark-bg-focus);
+        --focus-ring: var(--dark-focus-ring);
+
+        --shadow-light: 0 1px 2px rgba(0, 0, 0, 0.2);
+        --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.25);
+        --shadow-heavy: 0 12px 32px rgba(0, 0, 0, 0.3);
+    }
 }
 
 // HEADER
@@ -40,7 +78,7 @@
     display: flex;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
-    width: 100%; // 确保头部占据整个宽度
+    width: 100%;
     * {
         line-height: normal;
     }
@@ -59,7 +97,7 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-width: 0; // 允许容器收缩到小于其内容的宽度
+    min-width: 0;
     // TOOLBAR
     &-header {
         background-color: var(--bg-color-tertiary);
@@ -74,14 +112,6 @@
 
         &-toolbar {
         }
-    }
-
-    // CONTENT AREA
-    &-content {
-        position: relative;
-        background-color: var(--bg-color);
-        flex: 1;
-        overflow: hidden;
     }
 }
 
@@ -114,7 +144,7 @@
     :global(.textLayer) {
         z-index: 9 !important;
     }
-    :global(.annotationLayer) { 
+    :global(.annotationLayer) {
         z-index: 10 !important;
     }
 

@@ -155,9 +155,9 @@ export const PdfViewerProvider: React.FC<PdfViewerProviderProps> = ({
                         variant={activeSidebarPanel === panel.key ? 'soft' : 'outline'}
                         size="2"
                         color="gray"
+                        highContrast
                         style={{
                             boxShadow: 'none',
-                            color: '#000000'
                         }}
                         onClick={() => setActiveSidebarPanel((prev) => (prev === panel.key ? null : panel.key))}
                     >

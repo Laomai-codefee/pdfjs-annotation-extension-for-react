@@ -12,7 +12,7 @@ import { formatFileSize } from '../../utils/utils'
 import { loadFontWithFontFace } from '../../utils/fontLoader'
 import { ToolbarButton } from '@/components/toolbar_button'
 import { useOptionsContext } from '../../context/options_context'
-import { Button, Callout, Dialog, Flex, Popover, SegmentedControl, Select, Text } from '@radix-ui/themes'
+import { Button, Callout, Dialog, Flex, Popover, SegmentedControl, Select, Text, useThemeContext } from '@radix-ui/themes'
 import { AiOutlineImport, AiOutlinePlusCircle } from 'react-icons/ai';
 
 interface SignatureToolProps {
@@ -51,6 +51,8 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, defaul
 
     const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
     const [showFileSizeWarning, setShowFileSizeWarning] = useState(false)
+
+    const { appearance } = useThemeContext()
 
     const defaultSignatures = useMemo(() => {
         if (default_signatures) {
@@ -426,7 +428,7 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, defaul
                             )}
                         </div>
 
-                        <div className={styles.toolbar} style={{ width: signatureWidth }}>
+                        <div className={`${styles.toolbar} ${appearance === 'dark' ? styles.toolbarDark : ''}`} style={{ width: signatureWidth }}>
                             <Flex justify="between" align="center" gap="2">
                                 <div className={styles.colorPalette}>
                                     {

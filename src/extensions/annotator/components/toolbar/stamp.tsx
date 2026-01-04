@@ -21,7 +21,8 @@ import {
     TextField,
     Grid,
     CheckboxGroup,
-    Select
+    Select,
+    useThemeContext
 } from '@radix-ui/themes'
 import { AiOutlineBold, AiOutlineExclamationCircle, AiOutlineImport, AiOutlineItalic, AiOutlinePlusCircle, AiOutlineStrikethrough, AiOutlineUnderline } from 'react-icons/ai'
 import { ColorPicker } from '@/components/color_picker'
@@ -109,6 +110,8 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, default_stamps, o
     const { user } = useUserContext()
 
     const [customStamps, setCustomStamps] = useState<string[]>([])
+
+    const { appearance } = useThemeContext()
 
     const defaultStamps = useMemo(() => {
         if (default_stamps) {
@@ -513,7 +516,7 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, default_stamps, o
                     <div className={styles.StampTool}>
                         <div className={styles.container}>
                             <div
-                                className={styles.imagePreview}
+                                className={`${styles.imagePreview} ${appearance === 'dark' ? styles.imagePreviewDark : ''}` }
                                 ref={containerRef}
                                 style={{
                                     height: STAMP_HEIGHT

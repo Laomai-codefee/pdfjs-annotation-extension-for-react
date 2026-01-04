@@ -119,6 +119,7 @@ export default function App() {
 
 | Name                   | Type                    | Default                                 | Description                                            |
 | ---------------------- | ----------------------- | --------------------------------------- | ------------------------------------------------------ |
+| `appearance`         | `auto \| dark \| light`       | `auto`                       | Dark or Light theme. 
 | `theme`              | Radix Theme Color       | `violet`                              | Theme color of the viewer UI                           |
 | `title`              | `React.ReactNode`     | —                                      | Page title content; accepts text or custom React nodes |
 | `url *`              | `string \| URL`        | —                                      | PDF file URL; supports string URLs or `URL` objects  |
