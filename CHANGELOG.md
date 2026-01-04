@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.4] - 2026-01-02
+
+### Changed
+
+- Add Dark mode support
+
 ## [0.2.3] - 2026-01-02
 
 ### Changed
