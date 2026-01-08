@@ -1,3 +1,9 @@
+> ⚠️ **InkLayer 生态项目**
+>
+> 本仓库提供 InkLayer 的 React 绑定及示例集成，用于在前端应用中快速接入 PDF 批注能力。
+>
+> 👉 **InkLayer 主入口：** https://github.com/Laomai-codefee/inklayer
+
 <div>
     <h1 align="center"><code>pdfjs-annotation-extension-for-react</code> ⚡️ </h1>
     <p align="center">

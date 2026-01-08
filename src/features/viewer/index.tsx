@@ -1,6 +1,6 @@
 import '@radix-ui/themes/styles.css'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { PdfViewerProvider, SidebarPanel, SidebarPanelKey } from '../../context/pdf_viewer_provider'
 import i18n from '@/i18n'
 import { PdfBaseProps } from '@/types'

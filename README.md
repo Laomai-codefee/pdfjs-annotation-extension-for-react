@@ -1,3 +1,9 @@
+> ⚠️ **Part of the InkLayer ecosystem**
+>
+> This repository provides React bindings and example integrations for InkLayer.
+>
+> 👉 **Main entry point:** https://github.com/Laomai-codefee/inklayer
+
 <div>
     <h1 align="center"><code>pdfjs-annotation-extension-for-react</code> ⚡️ </h1>
     <p align="center">
