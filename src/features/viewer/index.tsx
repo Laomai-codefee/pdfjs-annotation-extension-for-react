@@ -114,6 +114,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
     enableRange = 'auto',
     title = 'PDF VIEWER',
     url,
+    data,
     locale = 'zh-CN',
     initialScale,
     layoutStyle,
@@ -151,6 +152,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
             <PdfViewerProvider
                 title={title}
                 url={url}
+                data={data}
                 sidebar={[{
                     key: 'search-sidebar',
                     title: t('viewer:search.search'),

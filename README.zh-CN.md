@@ -128,7 +128,8 @@ export default function App() {
 | `appearance`         | `auto \| dark \| light`       | `auto`                       | Dark or Light theme. 
 | `theme`              | Radix Theme Color       | `violet`                              | Theme color of the viewer UI                           |
 | `title`              | `React.ReactNode`     | —                                      | Page title content; accepts text or custom React nodes |
-| `url *`              | `string \| URL`        | —                                      | PDF file URL; supports string URLs or `URL` objects  |
+| `url`              | `string \| URL`        | —                                      | PDF file URL; supports string URLs or `URL` objects  |
+| `data`              | `string \| number[] \| ArrayBuffer \| Uint8Array \| Uint16Array \| Uint32Array`        | —                                      | PDF Data  |
 | `locale`             | `'zh-CN' \| 'en-US'`   | `zh-CN`                               | Locale used for internationalization                   |
 | `initialScale`       | `PdfScale`            | `auto`                                | Initial zoom level of the PDF viewer                   |
 | `layoutStyle`        | `React.CSSProperties` | `{ width: '100vw', height: '100vh' }` | Styles applied to the PDF viewer container             |

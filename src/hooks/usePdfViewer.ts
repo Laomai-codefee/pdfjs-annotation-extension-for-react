@@ -1,15 +1,24 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs'
 import { DownloadManager, EventBus, PDFFindController, PDFLinkService, PDFViewer } from 'pdfjs-dist/legacy/web/pdf_viewer.mjs'
-import { AnnotationEditorType, AnnotationMode, getDocument, PDFDataRangeTransport, PDFDocumentLoadingTask, PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs'
+import {
+    AnnotationEditorType,
+    AnnotationMode,
+    getDocument,
+    PDFDataRangeTransport,
+    PDFDocumentLoadingTask,
+    PDFDocumentProxy
+} from 'pdfjs-dist/legacy/build/pdf.mjs'
 
-import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
+import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl
 
 export interface UseViewerOptions {
     /** PDF 文件 URL */
-    url: string | URL
+    url: string | URL | undefined
+    /** PDF 数据 - 直接传入二进制数据，优先级高于 url */
+    data?: string | number[] | ArrayBuffer | Uint8Array | Uint16Array | Uint32Array
     /** 是否启用 Range 加载， 默认 auto */
     enableRange?: boolean | 'auto'
     /** PDF 加载成功回调 */
@@ -41,6 +50,7 @@ function isRangeFailure(error: unknown) {
 export function usePdfViewer(containerRef: React.RefObject<HTMLDivElement>, options: UseViewerOptions) {
     const {
         url,
+        data,
         enableRange = 'auto',
         onLoadSuccess,
         onLoadError,
@@ -82,7 +92,7 @@ export function usePdfViewer(containerRef: React.RefObject<HTMLDivElement>, opti
 
         const linkService = new PDFLinkService({ eventBus: bus, externalLinkTarget })
         const downloadManager = new DownloadManager()
-        const fc = new PDFFindController({ linkService, eventBus: bus });
+        const fc = new PDFFindController({ linkService, eventBus: bus })
 
         const viewer = new PDFViewer({
             container: containerRef.current,
@@ -93,7 +103,7 @@ export function usePdfViewer(containerRef: React.RefObject<HTMLDivElement>, opti
             linkService,
             downloadManager,
             removePageBorders: true,
-            findController: fc,
+            findController: fc
         })
 
         linkService.setViewer(viewer)
@@ -130,19 +140,33 @@ export function usePdfViewer(containerRef: React.RefObject<HTMLDivElement>, opti
 
     const createLoadingTask = useCallback(
         async (useRange: boolean) => {
-            if (useRange) {
+            if (data) {
+                // 如果提供了 data，则直接使用数据
+                return getDocument({
+                    data: data,
+                    disableRange: true,
+                    disableStream: true
+                })
+            } else if (url && useRange) {
                 const transport = await createTransport(url as string)
                 return getDocument({ range: transport })
+            } else if (url) {
+                return getDocument({ url, disableRange: true, disableStream: true })
+            } else {
+                throw new Error('Either url or data must be provided')
             }
-            return getDocument({ url, disableRange: true, disableStream: true })
         },
-        [url, createTransport]
+        [url, createTransport, data]
     )
 
     const loadingTaskRef = useRef<PDFDocumentLoadingTask | null>(null)
 
     const loadPdf = useCallback(async () => {
-        if (!url) return
+        if (!url && !data) {
+            setLoadError(new Error('Either url or data must be provided'))
+            setLoading(false)
+            return
+        }
 
         setLoading(true)
         setProgress(0)

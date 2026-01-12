@@ -71,7 +71,14 @@ export interface PdfBaseProps {
      * PDF 文件地址，支持字符串 URL 或 URL 对象
      * @example "https://example.com/doc.pdf"
      */
-    url: string | URL
+    url?: string | URL
+
+    /**
+     * PDF 数据 - 直接传入二进制数据，优先级高于 url
+     * 支持 base64 字符串、ArrayBuffer、TypedArray 等格式
+     */
+    data?: string | number[] | ArrayBuffer | Uint8Array | Uint16Array | Uint32Array
+
     /**
      * 语言区域，用于国际化
      * @default 'zh-CN'

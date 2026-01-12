@@ -24,6 +24,7 @@ export const PdfAnnotator: React.FC<PdfAnnotatorProps> = ({
     enableRange = 'auto',
     theme = 'violet',
     title = 'PDF ANNOTATOR',
+    data,
     url,
     locale = 'zh-CN',
     user = { id: 'null', name: 'unknown' },
@@ -156,6 +157,7 @@ export const PdfAnnotator: React.FC<PdfAnnotatorProps> = ({
                     <PdfViewerProvider
                         title={title}
                         url={url}
+                        data={data}
                         initialScale={initialScale}
                         user={user}
                         {...viewerOptions}

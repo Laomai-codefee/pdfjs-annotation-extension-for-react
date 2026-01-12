@@ -7,6 +7,7 @@ import PdfViewerBasic from './pdf_viewer_basic';
 import PdfViewerCustom from './pdf_viewer_custom';
 import PdfAnnotatorFull from './pdf_annotator_full';
 import PdfAnnotatorCustom from './pdf_annotator_custom';
+import PdfViewerWithData from './pdf_viewer_data';
 
 
 const App = () => {
@@ -16,6 +17,7 @@ const App = () => {
             <Tabs.Root defaultValue="PdfViewerBasic" onValueChange={setActiveTab}>
                 <Tabs.List>
                     <Tabs.Trigger value="PdfViewerBasic">PdfViewer Basic</Tabs.Trigger>
+                    <Tabs.Trigger value="PdfViewerData">PdfViewer Width Data</Tabs.Trigger>
                     <Tabs.Trigger value="PdfViewerCustom">PdfViewer Custom</Tabs.Trigger>
                     <Tabs.Trigger value="PdfAnnotatorBasic">PdfAnnotator Basic</Tabs.Trigger>
                     <Tabs.Trigger value="PdfAnnotatorCustom">PdfAnnotator Custom</Tabs.Trigger>
@@ -25,6 +27,7 @@ const App = () => {
             </Tabs.Root>
             <Box pt="0">
     {activeTab === 'PdfViewerBasic' && <PdfViewerBasic />}
+    {activeTab === 'PdfViewerData' && <PdfViewerWithData />}
     {activeTab === 'PdfViewerCustom' && <PdfViewerCustom />}
     {activeTab === 'PdfAnnotatorBasic' && <PdfAnnotatorBasic />}
     {activeTab === 'PdfAnnotatorCustom' && <PdfAnnotatorCustom />}
