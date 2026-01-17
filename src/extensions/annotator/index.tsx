@@ -119,6 +119,7 @@ export const AnnotatorExtension: React.FC<AnnotatorExtensionProps> = ({
         setPainter(painterInstance)
 
         const handlePageRendered = ({ source, cssTransform, pageNumber }: { source: PDFPageView; cssTransform: boolean; pageNumber: number }) => {
+            console.log('handlePageRendered', source, cssTransform, pageNumber)
             painterInstance.initCanvas({
                 pageView: source,
                 cssTransform,

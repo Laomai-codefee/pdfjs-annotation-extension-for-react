@@ -227,7 +227,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         draggable: false,
         icon: <UnderlineIcon />,
         style: {
-            color: '#4dabf7', // 默认下划线颜色
+            color: '#1272e8', // 默认下划线颜色
         },
         styleEditable: {
             color: true,

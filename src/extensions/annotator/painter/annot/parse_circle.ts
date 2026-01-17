@@ -5,15 +5,36 @@ import { convertKonvaRectToPdfRect, rgbToPdfColor, stringToPDFHexString } from '
 
 export class CircleParser extends AnnotationParser {
     async parse() {
-        const { annotation, page, pdfDoc } = this
+        const { annotation, page, pdfDoc, pageView } = this
         const context = pdfDoc.context
-        const pageHeight = page.getHeight()
+
+        const konvaGroup = JSON.parse(annotation.konvaString)
+
+        const konvaRect = konvaGroup.children.find((child: any) => child.className === 'Ellipse')
+
+        const strokeWidth = konvaRect.attrs.strokeWidth ?? 2
+
+        const dashArray = konvaRect.attrs.dash ?? []
+
+        const opacity = konvaRect.attrs.opacity ?? 1
+
+        let bsDict: any = {
+            W: PDFNumber.of(strokeWidth),
+            S: PDFName.of('S') // Solid
+        }
+
+        if (dashArray && dashArray.length > 0) {
+            bsDict.D = context.obj(dashArray)
+            bsDict.S = PDFName.of('D')
+        }
+
+        const rect = convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView)
 
         // 1️⃣ 主批注（圆形）
         const mainAnn = context.obj({
             Type: PDFName.of('Annot'),
             Subtype: PDFName.of('Circle'),
-            Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+            Rect: rect,
             C: rgbToPdfColor(annotation.color || '#000000'),
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
@@ -21,7 +42,8 @@ export class CircleParser extends AnnotationParser {
             NM: PDFString.of(annotation.id),
             F: PDFNumber.of(4),
             P: page.ref,
-            Border: [0, 0, 1] // 可选：1像素实线边框
+            BS: context.obj(bsDict),
+            CA: PDFNumber.of(opacity)
         })
         const mainAnnRef = context.register(mainAnn)
         this.addAnnotationToPage(page, mainAnnRef)
@@ -31,7 +53,7 @@ export class CircleParser extends AnnotationParser {
             const replyAnn = context.obj({
                 Type: PDFName.of('Annot'),
                 Subtype: PDFName.of('Text'),
-                Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+                Rect: rect,
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
                 M: PDFString.of(comment.date || ''),

@@ -5,10 +5,11 @@ import { t } from 'i18next'
 
 export class TextParser extends AnnotationParser {
     async parse() {
-        const { annotation, page, pdfDoc } = this
-        const rect = convertKonvaRectToPdfRect(annotation.konvaClientRect, page.getHeight())
+        const { annotation, page, pdfDoc, pageView } = this
+        const [x1, y1] = convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView)
         const context = pdfDoc.context
-
+        const iconSize = 32
+        const rect = [PDFNumber.of(x1), PDFNumber.of(y1), PDFNumber.of(x1 + iconSize), PDFNumber.of(y1 + iconSize)]
         const mainAnn = context.obj({
             Type: PDFName.of('Annot'),
             Subtype: PDFName.of('Text'),

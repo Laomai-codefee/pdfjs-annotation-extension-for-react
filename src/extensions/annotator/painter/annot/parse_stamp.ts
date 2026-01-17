@@ -1,69 +1,75 @@
-import { PDFName, PDFString, PDFNumber, PDFRawStream } from 'pdf-lib'
+import { PDFName, PDFNumber, PDFString, PDFRawStream } from 'pdf-lib'
 import { AnnotationParser } from './parse'
 import { convertKonvaRectToPdfRect, stringToPDFHexString } from '../../utils/utils'
 import { t } from 'i18next'
 
+function getCounterRotateMatrix(rotation: number, w: number, h: number) {
+    switch (rotation % 360) {
+        case 0:
+            return `1 0 0 1 0 0 cm`
+
+        case 90: // 页面逆时针 90° → AP 顺时针 90°
+            return `0 1 -1 0 ${h} 0 cm`
+
+        case 180:
+            return `-1 0 0 -1 ${w} ${h} cm`
+
+        case 270: // 页面逆时针 270° → AP 逆时针 90°
+            return `0 -1 1 0 0 ${w} cm`
+
+        default:
+            return `1 0 0 1 0 0 cm`
+    }
+}
+
+function getAppearanceBBox(rotation: number, w: number, h: number) {
+    const r = rotation % 360
+    if (r === 90 || r === 270) {
+        return [0, 0, h, w] // 交换
+    }
+    return [0, 0, w, h]
+}
+
 export class StampParser extends AnnotationParser {
     async parse() {
-        const { annotation, page, pdfDoc } = this
+        const { annotation, page, pdfDoc, pageView } = this
         const context = pdfDoc.context
 
-        // 转换坐标
-        const [x1, y1, x2, y2] = convertKonvaRectToPdfRect(annotation.konvaClientRect, page.getHeight())
+        const [x1, y1, x2, y2] = convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView)
+        const rectWidth = x2 - x1
+        const rectHeight = y2 - y1
 
-        const pageWidth = page.getWidth()
-        const pageHeight = page.getHeight()
+        const rect = [PDFNumber.of(x1), PDFNumber.of(y1), PDFNumber.of(x2), PDFNumber.of(y2)]
 
-        const left = Math.max(0, Math.min(x1, pageWidth))
-        const bottom = Math.max(0, Math.min(y1, pageHeight))
-        const right = Math.max(left, Math.min(x2, pageWidth))
-        const top = Math.max(bottom, Math.min(y2, pageHeight))
+        const rotation = pageView.pdfPageRotate || 0
+        let apDict
 
-        const rect = [PDFNumber.of(left), PDFNumber.of(bottom), PDFNumber.of(right), PDFNumber.of(top)]
-
-        // 嵌入图片
-        let apDict = undefined
         if (annotation.contentsObj?.image) {
-            // annotation.contentsObj.image 是 base64 png 字符串，格式 'data:image/png;base64,...'
-            // 去掉前缀，留纯 base64
             const base64Str = annotation.contentsObj.image.replace(/^data:image\/png;base64,/, '')
             const pngImage = await pdfDoc.embedPng(base64Str)
+            const bbox = getAppearanceBBox(rotation, rectWidth, rectHeight)
 
-            const width = pngImage.width
-            const height = pngImage.height
-
-            // 创建外观流 Appearance Stream，放图片
-            const appearanceStreamDict = context.obj({
+            // Appearance Stream BBox = Rect 尺寸
+            const appearanceDict = context.obj({
                 Type: 'XObject',
                 Subtype: 'Form',
-                BBox: [0, 0, width, height],
+                BBox: bbox,
                 Resources: context.obj({
-                    XObject: context.obj({
+                    XObject: {
                         Im1: pngImage.ref
-                    })
+                    }
                 })
             })
 
-            // 这里构造流内容（绘制图片）
-            // pdf-lib 里没有直接方法，我们自己写绘制指令：
-            // q - 保存图形状态
-            // w h cm - 变换矩阵，调整坐标系和缩放
-            // /Im1 Do - 绘制图片
-            // Q - 恢复图形状态
-
-            const contentStream = `q ${width} 0 0 ${height} 0 0 cm /Im1 Do Q`
-            const contentStreamBytes = new TextEncoder().encode(contentStream)
-
-            // 创建 PDFStream
-            const appearanceStream = PDFRawStream.of(appearanceStreamDict, contentStreamBytes)
+            const contentStream = `q ${getCounterRotateMatrix(rotation, rectWidth, rectHeight)} ${rectWidth} 0 0 ${rectHeight} 0 0 cm /Im1 Do Q`
+            const appearanceStream = PDFRawStream.of(appearanceDict, new TextEncoder().encode(contentStream))
             const appearanceStreamRef = context.register(appearanceStream)
 
             apDict = context.obj({
-                N: appearanceStreamRef // 正常状态外观 Normal Appearance
+                N: appearanceStreamRef
             })
         }
 
-        // 创建 Stamp 注释字典
         const stampAnnDict: any = {
             Type: PDFName.of('Annot'),
             Subtype: PDFName.of('Stamp'),
@@ -74,23 +80,21 @@ export class StampParser extends AnnotationParser {
             M: PDFString.of(annotation.date || ''),
             Open: false,
             P: page.ref,
-            F: PDFNumber.of(4 | 128) // Locked 锁定移动和调整位置
+            F: PDFNumber.of(4 | 128)
         }
 
-        if (apDict) {
-            stampAnnDict.AP = apDict
-        }
+        if (apDict) stampAnnDict.AP = apDict
 
         const stampAnn = context.obj(stampAnnDict)
         const stampAnnRef = context.register(stampAnn)
-
         this.addAnnotationToPage(page, stampAnnRef)
 
+        // 回复评论
         for (const comment of annotation.comments || []) {
             const replyAnn = context.obj({
                 Type: PDFName.of('Annot'),
                 Subtype: PDFName.of('Text'),
-                Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+                Rect: rect,
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
                 M: PDFString.of(comment.date || ''),

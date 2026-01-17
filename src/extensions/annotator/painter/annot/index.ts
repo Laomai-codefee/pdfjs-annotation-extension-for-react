@@ -15,12 +15,13 @@ import { PolylineParser } from './parse_polyline'
 import { formatPDFDate, getPDFDateTimestamp, getTimestampString } from '../../utils/utils'
 import { annotationDefinitions, CommentStatus, IAnnotationStore, PdfjsAnnotationType } from '../../const/definitions'
 import { PDFViewer } from 'pdfjs-dist/types/web/pdf_viewer'
+import { PDFPageView } from 'pdfjs-dist/types/web/pdf_page_view'
 import i18n from 'i18next'
 
 
 // 映射不同批注类型到对应的解析器类
 const parserMap: {
-    [key: number]: new (pdfDoc: PDFDocument, page: PDFPage, ann: IAnnotationStore) => AnnotationParser
+    [key: number]: new (pdfDoc: PDFDocument, page: PDFPage, ann: IAnnotationStore, pageView: PDFPageView) => AnnotationParser
 } = {
     [PdfjsAnnotationType.TEXT]: TextParser,
     [PdfjsAnnotationType.HIGHLIGHT]: HighlightParser,
@@ -43,10 +44,10 @@ const parserMap: {
  * @param page - 要添加注解的 PDF 页面
  * @param pdfDoc - 当前正在编辑的 PDF 文档实例
  */
-async function parseAnnotationToPdf(annotation: IAnnotationStore, page: PDFPage, pdfDoc: PDFDocument): Promise<void> {
+async function parseAnnotationToPdf(annotation: IAnnotationStore, page: PDFPage, pdfDoc: PDFDocument, pageView: PDFPageView): Promise<void> {
     const ParserClass = parserMap[annotation.pdfjsType]
     if (ParserClass) {
-        const parser = new ParserClass(pdfDoc, page, annotation)
+        const parser = new ParserClass(pdfDoc, page, annotation, pageView)
         await parser.parse()
     } else {
         console.warn('Unsupported annotation type:', annotation.pdfjsType)
@@ -105,7 +106,8 @@ async function exportAnnotationsToPdf(PDFViewerApplication: PDFViewer, annotatio
     // 遍历每一个注解并解析应用到对应页面
     for (const ann of annotations) {
         const page = pdfDoc.getPages()[ann.pageNumber - 1]
-        await parseAnnotationToPdf(ann, page, pdfDoc)
+        const pageView = PDFViewerApplication.getPageView(ann.pageNumber - 1);
+        await parseAnnotationToPdf(ann, page, pdfDoc, pageView)
     }
 
     const modifiedPdf = await pdfDoc.save()

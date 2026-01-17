@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid'
 import { PDFHexString } from 'pdf-lib'
 import i18n from 'i18next'
+import { PDFPageView } from 'pdfjs-dist/types/web/pdf_page_view'
 
 /**
  * 根据颜色字符串获取 RGB 数组。
@@ -330,24 +331,87 @@ function parseQueryString(query: string): Map<string, string> {
     return params
 }
 
-
-
-/**
- * 将 Konva 的 Rect（左上坐标系统）转换为 PDF 的 Rect（左下坐标系统）
- * @param konvaRect Konva 的 { x, y, width, height }
- * @param pageHeight 当前 PDF 页的高度
- * @returns 一个 [x1, y1, x2, y2] 数组，可用于 PDF 的 Rect
- */
 function convertKonvaRectToPdfRect(
     konvaRect: { x: number; y: number; width: number; height: number },
-    pageHeight: number
+    pageView: PDFPageView
 ): [number, number, number, number] {
-    const { x, y, width, height } = konvaRect
-    const pdfX1 = x
-    const pdfY1 = pageHeight - y - height
-    const pdfX2 = pdfX1 + width
-    const pdfY2 = pdfY1 + height
-    return [pdfX1, pdfY1, pdfX2, pdfY2]
+    const { viewport } = pageView
+    const scale = viewport.scale
+
+    const vx = konvaRect.x * scale
+    const vy = konvaRect.y * scale
+    const vw = konvaRect.width * scale
+    const vh = konvaRect.height * scale
+
+    const [x1, y1] = viewport.convertToPdfPoint(vx, vy)
+    const [x2, y2] = viewport.convertToPdfPoint(vx + vw, vy + vh)
+
+    return [Math.min(x1, x2), Math.min(y1, y2), Math.max(x1, x2), Math.max(y1, y2)]
+}
+
+function getPdfQuadPointsFromKonva(
+    rect: { x: number; y: number; width: number; height: number },
+    pageHeight: number,
+    pageWidth: number,
+    viewportScale: number,
+    rotation: number
+) {
+    // 1️⃣ 缩放回 PDF 尺寸
+    const x_pdf = rect.x / viewportScale
+    const y_pdf = rect.y / viewportScale
+    const w_pdf = rect.width / viewportScale
+    const h_pdf = rect.height / viewportScale
+
+    // 2️⃣ 转 PDF 坐标系 (左下为原点)
+    let x1 = x_pdf
+    let y1 = pageHeight - (y_pdf + h_pdf) // 左下
+    let x2 = x_pdf + w_pdf
+    let y2 = pageHeight - y_pdf // 右上
+
+    // 3️⃣ 根据 rotation 修正坐标
+    switch (rotation % 360) {
+        case 90: {
+            // PDF旋转90°: (x, y) -> (y, pageWidth - x2)
+            const tmpX1 = y1
+            const tmpY1 = pageWidth - x2
+            const tmpX2 = y2
+            const tmpY2 = pageWidth - x1
+            x1 = tmpX1
+            y1 = tmpY1
+            x2 = tmpX2
+            y2 = tmpY2
+            break
+        }
+        case 180: {
+            // PDF旋转180°: (x, y) -> (pageWidth - x2, pageHeight - y2)
+            const tmpX1 = pageWidth - x2
+            const tmpY1 = pageHeight - y2
+            const tmpX2 = pageWidth - x1
+            const tmpY2 = pageHeight - y1
+            x1 = tmpX1
+            y1 = tmpY1
+            x2 = tmpX2
+            y2 = tmpY2
+            break
+        }
+        case 270: {
+            // PDF旋转270°: (x, y) -> (pageHeight - y2, x1)
+            const tmpX1 = pageHeight - y2
+            const tmpY1 = x1
+            const tmpX2 = pageHeight - y1
+            const tmpY2 = x2
+            x1 = tmpX1
+            y1 = tmpY1
+            x2 = tmpX2
+            y2 = tmpY2
+            break
+        }
+        default:
+            break
+    }
+
+    // 4️⃣ QuadPoints: 左上, 右上, 左下, 右下
+    return [x1, y2, x2, y2, x1, y1, x2, y1]
 }
 
 function stringToPDFHexString(input: string): PDFHexString {
@@ -402,8 +466,6 @@ function hashArrayOfObjects<T extends Record<string, any>>(arr: T[]): number {
     return hash
 }
 
-
-
 export {
     base64ToImageBitmap,
     formatFileSize,
@@ -424,5 +486,6 @@ export {
     stringToPDFHexString,
     getTimestampString,
     hashArrayOfObjects,
-    getPDFDateTimestamp
+    getPDFDateTimestamp,
+    getPdfQuadPointsFromKonva
 }

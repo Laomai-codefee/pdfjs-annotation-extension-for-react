@@ -5,9 +5,8 @@ import { t } from 'i18next'
 
 export class UnderlineParser extends AnnotationParser {
     async parse() {
-        const { annotation, page, pdfDoc } = this
+        const { annotation, page, pdfDoc, pageView } = this
         const context = pdfDoc.context
-        const pageHeight = page.getHeight()
 
         const konvaGroup = JSON.parse(annotation.konvaString)
         const rects = konvaGroup.children.filter((item: any) => item.className === 'Rect')
@@ -15,19 +14,24 @@ export class UnderlineParser extends AnnotationParser {
         const quadPoints: number[] = []
 
         for (const rect of rects) {
-            const { x, y, width, height } = rect.attrs
-            const x1 = x
-            const y1 = pageHeight - y
-            const x2 = x + width
-            const y2 = pageHeight - (y + height)
-
-            quadPoints.push(x1, y1, x2, y1, x1, y2, x2, y2)
+            const [x1, y2, x2, y1] = convertKonvaRectToPdfRect(rect.attrs, pageView)
+            // QuadPoints: 每个矩形有 4 个点（左上、右上、左下、右下）
+            quadPoints.push(
+                x1,
+                y1, // 左上
+                x2,
+                y1, // 右上
+                x1,
+                y2, // 左下
+                x2,
+                y2 // 右下
+            )
         }
 
         const mainAnn = context.obj({
             Type: PDFName.of('Annot'),
             Subtype: PDFName.of('Underline'),
-            Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+            Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView),
             QuadPoints: quadPoints,
             C: rgbToPdfColor(annotation.color || '#000000'),
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
@@ -35,7 +39,7 @@ export class UnderlineParser extends AnnotationParser {
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
             M: PDFString.of(annotation.date || ''),
             NM: PDFString.of(annotation.id),
-            F: PDFNumber.of(4),
+            F: PDFNumber.of(4)
         })
         const mainAnnRef = context.register(mainAnn)
         this.addAnnotationToPage(page, mainAnnRef)
@@ -44,7 +48,7 @@ export class UnderlineParser extends AnnotationParser {
             const replyAnn = context.obj({
                 Type: PDFName.of('Annot'),
                 Subtype: PDFName.of('Text'),
-                Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+                Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView),
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
                 M: PDFString.of(comment.date || ''),

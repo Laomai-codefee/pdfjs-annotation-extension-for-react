@@ -25,7 +25,7 @@ function buildArrowHeadPoints(x1: number, y1: number, x2: number, y2: number, po
 
 export class LineParser extends AnnotationParser {
     async parse() {
-        const { annotation, page, pdfDoc } = this
+        const { annotation, page, pdfDoc, pageView } = this
         const context = pdfDoc.context
         const pageHeight = page.getHeight()
 
@@ -33,10 +33,9 @@ export class LineParser extends AnnotationParser {
 
         const lines = konvaGroup.children.filter((item: any) => item.className === 'Arrow')
 
-        const groupX = konvaGroup.attrs.x || 0
-        const groupY = konvaGroup.attrs.y || 0
-        const scaleX = konvaGroup.attrs.scaleX || 1
-        const scaleY = konvaGroup.attrs.scaleY || 1
+        const { groupX, groupY, scaleX, scaleY } = this.extractGroupTransform(konvaGroup)
+
+        const viewport = pageView.viewport
 
         const inkList = context.obj(
             lines.map((line: any) => {
@@ -45,23 +44,29 @@ export class LineParser extends AnnotationParser {
 
                 // ① 主线
                 for (let i = 0; i < points.length; i += 2) {
-                    const x = groupX + points[i] * scaleX
-                    const y = groupY + points[i + 1] * scaleY
-                    transformedPoints.push(x, pageHeight - y)
+                    const vx = groupX + points[i] * scaleX
+                    const vy = groupY + points[i + 1] * scaleY
+                    const viewportX = vx * viewport.scale
+                    const viewportY = vy * viewport.scale
+                    const [pdfX, pdfY] = viewport.convertToPdfPoint(viewportX, viewportY)
+                    transformedPoints.push(pdfX, pdfY)
                 }
 
                 // ② 箭头头部（新增）
                 if (points.length >= 4) {
                     const len = points.length
-                    const x1 = groupX + points[len - 4] * scaleX
-                    const y1 = groupY + points[len - 3] * scaleY
-                    const x2 = groupX + points[len - 2] * scaleX
-                    const y2 = groupY + points[len - 1] * scaleY
+                    const x1 = groupX + points[len - 4] * scaleX * viewport.scale
+                    const y1 = groupY + points[len - 3] * scaleY * viewport.scale
+                    const x2 = groupX + points[len - 2] * scaleX * viewport.scale
+                    const y2 = groupY + points[len - 1] * scaleY * viewport.scale
 
                     const pointerLength = line.attrs.pointerLength ?? 10
                     const pointerWidth = line.attrs.pointerWidth ?? 10
 
-                    const head = buildArrowHeadPoints(x1, pageHeight - y1, x2, pageHeight - y2, pointerLength, pointerWidth)
+                    const [x1_1, y1_1] = viewport.convertToPdfPoint(x1, y1)
+                    const [x2_1, y2_1] = viewport.convertToPdfPoint(x2, y2)
+
+                    const head = buildArrowHeadPoints(x1_1, y1_1, x2_1, y2_1, pointerLength, pointerWidth)
 
                     transformedPoints.push(...head)
                 }
@@ -85,14 +90,14 @@ export class LineParser extends AnnotationParser {
             Type: PDFName.of('Annot'),
             // 注意：PDF 的 Ink 注解不支持箭头样式，导出后将仅保留线条
             Subtype: PDFName.of('Ink'),
-            Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+            Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView),
             InkList: inkList,
             C: context.obj([PDFNumber.of(r), PDFNumber.of(g), PDFNumber.of(b)]),
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
             M: PDFString.of(annotation.date || ''),
             NM: PDFString.of(annotation.id),
-            Border: context.obj([0, 0, 0]),
+            LE: [PDFName.of('ClosedArrow'), PDFName.of('None')],
             BS: bs,
             F: PDFNumber.of(4),
             P: page.ref,
@@ -106,7 +111,7 @@ export class LineParser extends AnnotationParser {
             const replyAnn = context.obj({
                 Type: PDFName.of('Annot'),
                 Subtype: PDFName.of('Text'),
-                Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+                Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView),
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
                 M: PDFString.of(comment.date || ''),

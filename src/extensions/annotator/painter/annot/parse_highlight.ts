@@ -5,9 +5,8 @@ import { t } from 'i18next'
 
 export class HighlightParser extends AnnotationParser {
     async parse() {
-        const { annotation, page, pdfDoc } = this
+        const { annotation, page, pdfDoc, pageView } = this
         const context = pdfDoc.context
-        const pageHeight = page.getHeight()
 
         const konvaGroup = JSON.parse(annotation.konvaString)
         const rects = konvaGroup.children.filter((item: any) => item.className === 'Rect')
@@ -15,12 +14,7 @@ export class HighlightParser extends AnnotationParser {
         const quadPoints: number[] = []
 
         for (const rect of rects) {
-            const { x, y, width, height } = rect.attrs
-            const x1 = x
-            const y1 = pageHeight - y
-            const x2 = x + width
-            const y2 = pageHeight - (y + height)
-
+            const [x1, y2, x2, y1] = convertKonvaRectToPdfRect(rect.attrs, pageView)
             // QuadPoints: 每个矩形有 4 个点（左上、右上、左下、右下）
             quadPoints.push(
                 x1, y1, // 左上
@@ -32,7 +26,7 @@ export class HighlightParser extends AnnotationParser {
         const mainAnn = context.obj({
             Type: PDFName.of('Annot'),
             Subtype: PDFName.of('Highlight'),
-            Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+            Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView),
             QuadPoints: quadPoints,
             C: rgbToPdfColor(annotation.color || '#000000'), // 批注颜色
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')), // 作者

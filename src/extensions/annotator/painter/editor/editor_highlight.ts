@@ -126,11 +126,10 @@ export class EditorHighLight extends Editor {
             x,
             y: height + y - 2,
             width,
-            stroke: this.currentAnnotation!.style!.color,
+            fill: this.currentAnnotation!.style!.color,
             opacity: 1,
-            strokeWidth: 0.5,
             hitStrokeWidth: 10,
-            height: 0.5
+            height: 1.5
         })
     }
 
@@ -147,11 +146,10 @@ export class EditorHighLight extends Editor {
             x,
             y: y + height / 2,
             width,
-            stroke: this.currentAnnotation!.style!.color,
+            fill: this.currentAnnotation!.style!.color,
             opacity: 1,
-            strokeWidth: 0.5,
             hitStrokeWidth: 10,
-            height: 0.5
+            height: 2
         })
     }
 
@@ -196,7 +194,7 @@ export class EditorHighLight extends Editor {
                 if (annotationStore.type === AnnotationType.UNDERLINE) {
                     if (shape instanceof Konva.Rect) {
                         if (styles.color !== undefined) {
-                            shape.stroke(styles.color)
+                            shape.fill(styles.color)
                         }
                         if (styles.strokeWidth !== undefined) {
                             shape.strokeWidth(styles.strokeWidth)

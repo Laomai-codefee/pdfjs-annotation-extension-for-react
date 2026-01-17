@@ -5,15 +5,33 @@ import { t } from 'i18next'
 
 export class SquareParser extends AnnotationParser {
     async parse() {
-        const { annotation, page, pdfDoc } = this
+        const { annotation, page, pdfDoc, pageView } = this
         const context = pdfDoc.context
-        const pageHeight = page.getHeight()
+
+        const konvaGroup = JSON.parse(annotation.konvaString)
+
+        const konvaRect = konvaGroup.children.find((child: any) => child.className === 'Rect')
+
+        const strokeWidth = konvaRect.attrs.strokeWidth ?? 2
+
+        const dashArray = konvaRect.attrs.dash ?? []
+
+        const opacity = konvaRect.attrs.opacity ?? 1
+        let bsDict: any = {
+            W: PDFNumber.of(strokeWidth),
+            S: PDFName.of('S') // Solid
+        }
+
+        if (dashArray && dashArray.length > 0) {
+            bsDict.D = context.obj(dashArray)
+            bsDict.S = PDFName.of('D')
+        }
 
         // 1️⃣ 主批注（方框）
         const mainAnn = context.obj({
             Type: PDFName.of('Annot'),
             Subtype: PDFName.of('Square'),
-            Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+            Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView),
             C: rgbToPdfColor(annotation.color || '#000000'), // 边框颜色
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')), // 作者
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''), // 说明文字
@@ -21,7 +39,8 @@ export class SquareParser extends AnnotationParser {
             NM: PDFString.of(annotation.id), // 唯一标识
             F: PDFNumber.of(4),
             P: page.ref,
-            Border: [0, 0, 1] // 可选：设置边框样式为实线宽度1
+            BS: context.obj(bsDict),
+            CA: PDFNumber.of(opacity)
         })
         const mainAnnRef = context.register(mainAnn)
         this.addAnnotationToPage(page, mainAnnRef)
@@ -31,7 +50,7 @@ export class SquareParser extends AnnotationParser {
             const replyAnn = context.obj({
                 Type: PDFName.of('Annot'),
                 Subtype: PDFName.of('Text'),
-                Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
+                Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView),
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
                 M: PDFString.of(comment.date || ''),

@@ -5,22 +5,12 @@ import { t } from 'i18next'
 
 export class FreeTextParser extends AnnotationParser {
     async parse() {
-        const { annotation, page, pdfDoc } = this
-        const [x1, , , y2] = convertKonvaRectToPdfRect(annotation.konvaClientRect, page.getHeight())
+        const { annotation, page, pdfDoc, pageView } = this
+        const [x1, y1] = convertKonvaRectToPdfRect(annotation.konvaClientRect, pageView)
         const context = pdfDoc.context
-
-        const pageWidth = page.getWidth()
-        const pageHeight = page.getHeight()
-
         // 计算图标宽高固定20
         const iconSize = 20
-
-        // 限制 x1、y2 不能小于0，x1+iconSize 不能超过页面宽度，y2 不能超过页面高度
-        const xLeft = Math.max(0, Math.min(x1, pageWidth - iconSize))
-        const yTop = Math.min(pageHeight, Math.max(y2, iconSize)) // y2 是顶部坐标
-        const yBottom = yTop - iconSize
-
-        const rect = [PDFNumber.of(xLeft), PDFNumber.of(yBottom), PDFNumber.of(xLeft + iconSize), PDFNumber.of(yTop)]
+        const rect = [PDFNumber.of(x1), PDFNumber.of(y1), PDFNumber.of(x1 + iconSize), PDFNumber.of(y1 + iconSize)]
 
         const mainAnn = context.obj({
             Type: PDFName.of('Annot'),

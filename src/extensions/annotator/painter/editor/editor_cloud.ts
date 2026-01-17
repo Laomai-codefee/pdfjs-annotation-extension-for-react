@@ -64,7 +64,8 @@ export class EditorCloud extends Editor {
                 lineJoin: 'round',
                 lineCap: 'round',
                 hitStrokeWidth: 20, // 设置点击检测的宽度
-                opacity: this.currentAnnotation!.style!.opacity
+                opacity: this.currentAnnotation!.style!.opacity,
+                strokeScaleEnabled: false
             })
 
             this.currentShapeGroup.konvaGroup.add(this.cloudPath)
@@ -120,7 +121,7 @@ export class EditorCloud extends Editor {
             this.setShapeGroupDone({
                 id: this.currentShapeGroup.konvaGroup.id(),
                 color: this.currentAnnotation!.style!.color,
-                contentsObj: { text: '' },
+                contentsObj: { text: '' }
             })
 
             // 刷新图层绘制
@@ -161,8 +162,8 @@ export class EditorCloud extends Editor {
      */
     private generateCloudPathData(points: { x: number; y: number }[]): string {
         if (points.length < 2) return ''
-        const radius = 12 // 波浪的半径
-        const waveStep = radius * 1.1 // 波浪的步长，控制波浪的密度
+        const radius = 15 // 波浪的半径
+        const waveStep = radius * 1.3 // 波浪的步长，控制波浪的密度
         const center = this.computeCentroid(points)
 
         let path = ''
