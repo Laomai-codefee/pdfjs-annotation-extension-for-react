@@ -37,7 +37,8 @@
 ---
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Laomai-codefee/inklayer-react/main/screenshot.png" alt="InkLayer React Screenshot" width="80%" />
+  <img alt="InkLayer React PDF annotation demo — highlight, ink, shapes and comments" 
+       width="80%" src="https://github.com/user-attachments/assets/73144a7f-6001-4f23-877a-144ac5231e76" />
 </p>
 
 ## ⭐ Quick Start (Recommended)
