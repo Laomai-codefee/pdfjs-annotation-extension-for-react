@@ -200,18 +200,27 @@ describe('AnnotationReferenceInput', () => {
         })
     })
 
-    it('restores focus after an enclosing overlay finishes closing', async () => {
-        const { input } = renderInput()
+    it('restores focus after an enclosing overlay finishes closing', () => {
+        jest.useFakeTimers()
         const previousTrigger = document.createElement('button')
         document.body.appendChild(previousTrigger)
 
-        act(() => {
-            previousTrigger.focus()
-        })
-        expect(document.activeElement).toBe(previousTrigger)
+        try {
+            const { input } = renderInput()
 
-        await waitFor(() => expect(document.activeElement).toBe(input))
-        previousTrigger.remove()
+            act(() => {
+                previousTrigger.focus()
+            })
+            expect(document.activeElement).toBe(previousTrigger)
+
+            act(() => {
+                jest.advanceTimersByTime(20)
+            })
+            expect(document.activeElement).toBe(input)
+        } finally {
+            previousTrigger.remove()
+            jest.useRealTimers()
+        }
     })
 
     it('supports arrow-key selection before insertion', () => {
